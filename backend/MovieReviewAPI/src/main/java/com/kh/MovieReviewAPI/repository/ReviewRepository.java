@@ -13,7 +13,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 	List<Review> findByMovie_TmdbId(Long tmdbId);
 
 	// 회원이 작성한 리뷰 목록
-	List<Review> findByMember_Id(Long memberId);
+	List<Review> findByMember_Email(String email);
 
 	// 영화별 평균 평점 계산 (선택적으로 쿼리 작성 가능)
 	@Query("SELECT AVG(r.rating) FROM Review r WHERE r.movie.tmdbId = :tmdbId")

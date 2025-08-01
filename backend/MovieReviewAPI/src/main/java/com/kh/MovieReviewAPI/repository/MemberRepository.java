@@ -7,5 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.kh.MovieReviewAPI.entity.Member;
 
 public interface MemberRepository extends JpaRepository<Member, String> {
+
+    Optional<Member> findByEmail(String email);
 	
 }
