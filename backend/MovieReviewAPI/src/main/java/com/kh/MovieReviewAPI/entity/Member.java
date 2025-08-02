@@ -2,8 +2,6 @@ package com.kh.MovieReviewAPI.entity;
 
 import java.util.List;
 
-import com.kh.MovieReviewAPI.entity.MemberRole;
-
 import java.util.ArrayList;
 
 import jakarta.persistence.ElementCollection;

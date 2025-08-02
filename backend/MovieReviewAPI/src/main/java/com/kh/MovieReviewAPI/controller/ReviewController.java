@@ -5,6 +5,7 @@ import com.kh.MovieReviewAPI.dto.ReviewResponse;
 import com.kh.MovieReviewAPI.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     // 리뷰 작성
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<ReviewResponse> createReview(
             @RequestHeader("X-USER-EMAIL") String email,
