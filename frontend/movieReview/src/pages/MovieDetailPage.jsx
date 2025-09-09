@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Row, Col, Image, Card, Button, ListGroup } from 'react-bootstrap';
 import Loading from '../components/Loading'; // Loading 컴포넌트 import
+import { getMovieReviews, deleteReview as apiDeleteReview } from '../api/reviewApi.jsx';
 
 const MovieDetailPage = () => {
   const { id } = useParams();
@@ -13,9 +14,6 @@ const MovieDetailPage = () => {
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [errorReviews, setErrorReviews] = useState(null);
   const navigate = useNavigate();
-
-  // 임시 사용자 이메일 (로그인 기능 구현 시 동적으로 변경 필요)
-  const currentUserEmail = 'test@test.com';
 
   const handleWriteReviewClick = () => {
     navigate(`/movie/${id}/review`);
@@ -29,13 +27,8 @@ const MovieDetailPage = () => {
   const handleDeleteReview = async (reviewId) => {
     if (window.confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
       try {
-        await axios.delete(`http://localhost:8080/api/reviews/${reviewId}`, {
-          headers: {
-            'X-USER-EMAIL': currentUserEmail,
-          },
-        });
+        await apiDeleteReview(reviewId);
         alert('리뷰가 삭제되었습니다.');
-        // 리뷰 삭제 후 리뷰 목록을 새로고침
         fetchReviews();
       } catch (err) {
         console.error('리뷰 삭제 실패:', err.response ? err.response.data : err.message);
@@ -75,12 +68,13 @@ const MovieDetailPage = () => {
 
   // Fetch reviews (함수를 분리하여 재사용 가능하게 함)
   const fetchReviews = async () => {
+    setLoadingReviews(true);
     try {
-      const response = await axios.get(`http://localhost:8080/api/reviews?tmdbId=${id}`);
-      setReviews(response.data);
-      setLoadingReviews(false);
+      const data = await getMovieReviews(id);
+      setReviews(data);
     } catch (err) {
       setErrorReviews(err);
+    } finally {
       setLoadingReviews(false);
     }
   };

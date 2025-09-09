@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Card, Spinner, Alert, Button } from 'react-bootstrap';
 import Loading from '../components/Loading'; // Loading 컴포넌트 import
+import jwtAxios from '../util/jwtUtil'; // jwtAxios import 추가
+import { useSelector } from 'react-redux';
 
 const NoticeDetailPage = () => {
   const { id } = useParams();
@@ -11,8 +13,8 @@ const NoticeDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 임시 사용자 이메일 (로그인 기능 구현 시 동적으로 변경 필요)
-  const currentUserEmail = 'test@example.com';
+  const loginState = useSelector(state => state.loginSlice);
+  const isAdmin = loginState?.roleNames?.includes('ADMIN');
 
   const fetchNotice = async () => {
     setLoading(true);
@@ -38,11 +40,7 @@ const NoticeDetailPage = () => {
   const handleDelete = async () => {
     if (window.confirm('정말로 이 공지사항을 삭제하시겠습니까?')) {
       try {
-        await axios.delete(`http://localhost:8080/api/notices/${id}`, {
-          headers: {
-            'X-USER-EMAIL': currentUserEmail,
-          },
-        });
+        await jwtAxios.delete(`http://localhost:8080/api/notices/${id}`);
         alert('공지사항이 삭제되었습니다.');
         navigate('/notices'); // 삭제 후 목록 페이지로 이동
       } catch (err) {
@@ -94,7 +92,7 @@ const NoticeDetailPage = () => {
         </Card.Body>
       </Card>
       <div className="d-flex justify-content-end mt-3">
-        {notice.authorNickname === 'test' && ( // 임시로 작성자 닉네임이 'test'일 경우에만 수정/삭제 버튼 표시
+        {isAdmin && ( // ADMIN 역할일 경우에만 수정/삭제 버튼 표시
           <>
             <Button variant="secondary" className="me-2" onClick={handleEdit}>수정</Button>
             <Button variant="danger" onClick={handleDelete}>삭제</Button>

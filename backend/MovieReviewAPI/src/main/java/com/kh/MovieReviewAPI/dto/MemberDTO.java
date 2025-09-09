@@ -21,7 +21,7 @@ public class MemberDTO extends User {
 	public MemberDTO(String email, String pw, String nickname, boolean social, List<String> roleNames) {
 		// 이메일(사용자 아이디), 비밀번호, 권한목록(roles 또는 authorities)을 받아 UserDetails 객체로 만들어준다.
 		super(email, pw,
-				roleNames.stream().map(str -> new SimpleGrantedAuthority("Role_" + str)).collect(Collectors.toList()));
+				roleNames.stream().map(str -> new SimpleGrantedAuthority("ROLE_" + str)).collect(Collectors.toList()));
 		this.email = email;
 		this.pw = pw;
 		this.nickname = nickname;

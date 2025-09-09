@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
+import jwtAxios from '../util/jwtUtil'; // jwtAxios import 추가
 import StarRating from '../components/StarRating'; // StarRating 컴포넌트 import
 import Loading from '../components/Loading'; // Loading 컴포넌트 import
 
@@ -16,11 +17,10 @@ const ReviewFormPage = () => {
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const currentUserEmail = 'test@test.com';
-
   useEffect(() => {
     const fetchMovieTitle = async () => {
       try {
+        // 영화 정보는 인증이 필요 없으므로 일반 axios 사용
         const response = await axios.get(`http://localhost:8080/api/movies/${id}`);
         setMovieTitle(response.data.title);
         setLoadingMovie(false);
@@ -46,15 +46,8 @@ const ReviewFormPage = () => {
         rating: rating,
       };
 
-      // 임시 사용자 이메일 (로그인 기능 구현 시 동적으로 변경 필요)
-      const userEmail = 'test@test.com'; 
-
-      await axios.post('http://localhost:8080/api/reviews', reviewData, {
-        headers: {
-          'X-USER-EMAIL': userEmail,
-          'Content-Type': 'application/json',
-        },
-      });
+      // 리뷰 작성은 인증이 필요하므로 jwtAxios 사용
+      await jwtAxios.post('http://localhost:8080/api/reviews', reviewData);
 
       setSubmitSuccess(true);
       alert('리뷰가 성공적으로 작성되었습니다!');

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; // useNavigate import 추가
 import axios from 'axios';
+import jwtAxios from '../util/jwtUtil'; // jwtAxios import 추가
 import { Container, Card, Spinner, Alert, Row, Col, Button } from 'react-bootstrap'; // Button import 추가
+import { useSelector } from 'react-redux'; // useSelector import 추가
 
 const ReviewDetailPage = () => {
   const { movieId, reviewId } = useParams();
@@ -10,8 +12,9 @@ const ReviewDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 임시 사용자 이메일 (로그인 기능 구현 시 동적으로 변경 필요)
-  const currentUserEmail = 'test@test.com';
+  // 로그인한 사용자 정보 가져오기
+  const loginState = useSelector(state => state.loginSlice);
+  const currentUserEmail = loginState.email;
 
   const handleEditReview = () => {
     navigate(`/movie/${movieId}/review/${reviewId}/edit`);
@@ -20,11 +23,8 @@ const ReviewDetailPage = () => {
   const handleDeleteReview = async () => {
     if (window.confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
       try {
-        await axios.delete(`http://localhost:8080/api/reviews/${reviewId}`, {
-          headers: {
-            'X-USER-EMAIL': currentUserEmail,
-          },
-        });
+        // 리뷰 삭제는 인증이 필요하므로 jwtAxios 사용
+        await jwtAxios.delete(`http://localhost:8080/api/reviews/${reviewId}`);
         alert('리뷰가 삭제되었습니다.');
         navigate(`/movie/${movieId}`); // 삭제 후 영화 상세 페이지로 이동
       } catch (err) {
@@ -37,6 +37,7 @@ const ReviewDetailPage = () => {
   useEffect(() => {
     const fetchReviewDetail = async () => {
       try {
+        // 리뷰 정보는 인증이 필요 없으므로 일반 axios 사용
         const response = await axios.get(`http://localhost:8080/api/reviews/${reviewId}`);
         setReview(response.data);
         setLoading(false);

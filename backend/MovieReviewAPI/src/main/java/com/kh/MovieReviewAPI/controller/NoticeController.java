@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +25,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/notices")
@@ -37,11 +39,13 @@ public class NoticeController {
 	private String uploadDir;
 
 	// 공지사항 생성
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping
-	public ResponseEntity<NoticeResponse> createNotice(@RequestHeader("X-USER-EMAIL") String email, // 작성자 이메일 (임시)
+	public ResponseEntity<NoticeResponse> createNotice(Principal principal,
 			@RequestPart("request") String requestJson, // JSON 데이터
 			@RequestPart(value = "file", required = false) MultipartFile file) { // 파일 (선택 사항)
 		try {
+			String email = principal.getName();
 			NoticeRequest request = objectMapper.readValue(requestJson, NoticeRequest.class); // String을 NoticeRequest로 파싱
 			NoticeResponse response = noticeService.createNotice(email, request, file);
 			return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -66,12 +70,14 @@ public class NoticeController {
 	}
 
 	// 공지사항 수정
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{id}")
 	public ResponseEntity<NoticeResponse> updateNotice(@PathVariable Long id,
-			@RequestHeader("X-USER-EMAIL") String email, // 작성자 이메일 (임시)
+			Principal principal,
 			@RequestPart("request") String requestJson,
 			@RequestPart(value = "file", required = false) MultipartFile file) {
 		try {
+			String email = principal.getName();
 			NoticeRequest request = objectMapper.readValue(requestJson, NoticeRequest.class); // String을 NoticeRequest로 파싱
 			NoticeResponse response = noticeService.updateNotice(id, email, request, file);
 			return ResponseEntity.ok(response);
@@ -81,10 +87,10 @@ public class NoticeController {
 	}
 
 	// 공지사항 삭제
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteNotice(@PathVariable Long id, @RequestHeader("X-USER-EMAIL") String email) { // 작성자
-																													// 이메일
-																													// (임시)
+	public ResponseEntity<Void> deleteNotice(@PathVariable Long id, Principal principal) {
+		String email = principal.getName();
 		noticeService.deleteNotice(id, email);
 		return ResponseEntity.noContent().build();
 	}

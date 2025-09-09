@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import jwtAxios from '../util/jwtUtil'; // jwtAxios import 추가
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Form, Button, Spinner, Alert } from 'react-bootstrap';
 
@@ -14,9 +15,6 @@ const NoticeFormPage = () => {
   const [error, setError] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // 임시 사용자 이메일 (로그인 기능 구현 시 동적으로 변경 필요)
-  const currentUserEmail = 'test@test.com';
-
   useEffect(() => {
     if (id) { // 수정 모드
       setIsEditMode(true);
@@ -24,6 +22,7 @@ const NoticeFormPage = () => {
         setLoading(true);
         setError(null);
         try {
+          // 공지사항 정보는 인증이 필요 없으므로 일반 axios 사용
           const response = await axios.get(`http://localhost:8080/api/notices/${id}`);
           setTitle(response.data.title);
           setContent(response.data.content);
@@ -54,18 +53,18 @@ const NoticeFormPage = () => {
 
     try {
       if (isEditMode) {
-        await axios.put(`http://localhost:8080/api/notices/${id}`, formData, {
+        // 공지사항 수정은 인증이 필요하므로 jwtAxios 사용
+        await jwtAxios.put(`http://localhost:8080/api/notices/${id}`, formData, {
           headers: {
-            'X-USER-EMAIL': currentUserEmail,
             'Content-Type': 'multipart/form-data',
           },
         });
         alert('공지사항이 성공적으로 수정되었습니다!');
         navigate(`/notices/${id}`); // 수정 후 상세 페이지로 이동
       } else {
-        await axios.post('http://localhost:8080/api/notices', formData, {
+        // 공지사항 생성은 인증이 필요하므로 jwtAxios 사용
+        await jwtAxios.post('http://localhost:8080/api/notices', formData, {
           headers: {
-            'X-USER-EMAIL': currentUserEmail,
             'Content-Type': 'multipart/form-data',
           },
         });

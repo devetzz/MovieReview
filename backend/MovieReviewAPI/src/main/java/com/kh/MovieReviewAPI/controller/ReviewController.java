@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -18,11 +19,12 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     // 리뷰 작성
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PostMapping
     public ResponseEntity<ReviewResponse> createReview(
-            @RequestHeader("X-USER-EMAIL") String email,
+            Principal principal,
             @RequestBody ReviewRequest request) {
+        String email = principal.getName();
         ReviewResponse response = reviewService.createReview(email, request);
         return ResponseEntity.ok(response);
     }
@@ -45,8 +47,9 @@ public class ReviewController {
     @PutMapping("/{reviewId}")
     public ResponseEntity<ReviewResponse> updateReview(
             @PathVariable Long reviewId,
-            @RequestHeader("X-USER-EMAIL") String email,
+            Principal principal,
             @RequestBody ReviewRequest request) {
+        String email = principal.getName();
         ReviewResponse response = reviewService.updateReview(reviewId, email, request);
         return ResponseEntity.ok(response);
     }
@@ -55,7 +58,8 @@ public class ReviewController {
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<Void> deleteReview(
             @PathVariable Long reviewId,
-            @RequestHeader("X-USER-EMAIL") String email) {
+            Principal principal) {
+        String email = principal.getName();
         reviewService.deleteReview(reviewId, email);
         return ResponseEntity.noContent().build();
     }

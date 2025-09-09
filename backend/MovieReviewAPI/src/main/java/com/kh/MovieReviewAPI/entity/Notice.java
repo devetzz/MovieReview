@@ -15,8 +15,10 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "NOTICE")
@@ -25,7 +27,9 @@ import lombok.NoArgsConstructor;
 		sequenceName = "NOTICE_SEQ", // 데이터베이스 시퀀스 이름
 		allocationSize = 1 // 시퀀스 할당 크기
 )
-@Data
+@Getter
+@Setter
+@ToString(exclude = "author")
 @NoArgsConstructor
 public class Notice {
 	@Id

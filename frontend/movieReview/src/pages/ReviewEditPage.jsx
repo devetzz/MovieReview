@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import jwtAxios from '../util/jwtUtil'; // jwtAxios import 추가
 import { Container, Form, Button, Spinner, Alert } from 'react-bootstrap';
 import StarRating from '../components/StarRating'; // StarRating 컴포넌트 import
 import Loading from '../components/Loading'; // Loading 컴포넌트 import
@@ -20,12 +21,12 @@ const ReviewEditPage = () => {
   useEffect(() => {
     const fetchReviewAndMovieDetail = async () => {
       try {
-        // 영화 제목 가져오기
+        // 영화 제목 가져오기 (인증 불필요)
         const movieResponse = await axios.get(`http://localhost:8080/api/movies/${movieId}`);
         setMovieTitle(movieResponse.data.title);
         setLoadingMovie(false);
 
-        // 리뷰 상세 정보 가져오기
+        // 리뷰 상세 정보 가져오기 (인증 불필요)
         const reviewResponse = await axios.get(`http://localhost:8080/api/reviews/${reviewId}`);
         setReviewContent(reviewResponse.data.content);
         setRating(reviewResponse.data.rating);
@@ -50,14 +51,8 @@ const ReviewEditPage = () => {
         rating: rating,
       };
 
-      const userEmail = 'test@test.com'; // 임시 사용자 이메일
-
-      await axios.put(`http://localhost:8080/api/reviews/${reviewId}`, updatedReviewData, {
-        headers: {
-          'X-USER-EMAIL': userEmail,
-          'Content-Type': 'application/json',
-        },
-      });
+      // 리뷰 수정은 인증이 필요하므로 jwtAxios 사용
+      await jwtAxios.put(`http://localhost:8080/api/reviews/${reviewId}`, updatedReviewData);
 
       alert('리뷰가 성공적으로 수정되었습니다!');
       navigate(`/movie/${movieId}/review/${reviewId}`); // 수정 후 리뷰 상세 페이지로 이동

@@ -1,8 +1,10 @@
 import React, { useState } from 'react'; // useState import 추가
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 
 const NavigationBar = () => {
+  const loginState = useSelector((state) => state.loginSlice);
   const [showDropdown, setShowDropdown] = useState(false); // 드롭다운 상태 관리
 
   const handleMouseEnter = () => setShowDropdown(true);
@@ -34,6 +36,13 @@ const NavigationBar = () => {
               <NavDropdown.Item as={Link} to="/movies/upcoming" onClick={() => setShowDropdown(false)}>개봉 예정작</NavDropdown.Item> {/* 클릭 시 드롭다운 닫기 */}
             </NavDropdown>
             <Nav.Link as={Link} to="/notices" className="me-3"><strong style={{ opacity: 0.9 }}>공지사항</strong></Nav.Link>
+          </Nav>
+          <Nav>
+            {!loginState.email ? (
+              <Link to={'/member/login'}>Login</Link>
+            ) : (
+              <Link to={'/member/logout'}>Logout</Link>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>
