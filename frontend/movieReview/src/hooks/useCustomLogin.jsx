@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate, createSearchParams } from "react-router-dom";
 import { loginPostAsync, logout } from "../slices/loginSlice";
 import { unwrapResult } from '@reduxjs/toolkit';
+import { useCallback } from "react";
 
 const useCustomLogin = () => {
   const navigate = useNavigate();
@@ -22,9 +23,9 @@ const useCustomLogin = () => {
   const doLogout = () => { //---------------로그아웃 함수
     dispatch(logout())
   }
-  const moveToPath = (path) => { //페이지 이동 replace:true 뒤로이동 방지
+  const moveToPath = useCallback((path) => {
     navigate({ pathname: path }, { replace: true });
-  }
+  }, [navigate]);
   const moveToLogin = () => { //로그인 페이지로 이동
     navigate({ pathname: '/member/login' }, { replace: true });
   }
@@ -48,7 +49,7 @@ const useCustomLogin = () => {
       return
     }
   }
-  
+
   return { loginState, isLogin, doLogin, doLogout, moveToPath, moveToLogin, moveToLoginReturn, exceptionHandle };
 }
 export default useCustomLogin;

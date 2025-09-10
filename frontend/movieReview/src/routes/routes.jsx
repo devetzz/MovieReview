@@ -11,6 +11,8 @@ import NoticeDetailPage from '../pages/NoticeDetailPage';
 import NoticeFormPage from '../pages/NoticeFormPage';
 import LoginPage from '../pages/member/LoginPage';
 import LogoutPage from '../pages/member/LogoutPage';
+import KakaoRedirect from '../pages/member/KakaoRedirectPage';
+import MemberModify from '../pages/member/ModifyPage';
 
 import App from '../App';
 import AdminRoute from './AdminRoute'; // AdminRoute import
@@ -65,12 +67,23 @@ const router = createBrowserRouter([
         element: <AdminRoute><NoticeFormPage /></AdminRoute>, // Protected
       },
       {
-        path: '/member/login', 
+        path: '/member/login',
         element: <LoginPage />,
       },
       {
-        path: '/member/logout', 
+        path: '/member/logout',
         element: <LogoutPage />,
+      },
+      // Kakao Page 경로
+      {
+        path: '/member/kakao', element: (
+          <KakaoRedirect />
+        ),
+      },
+      {
+        path: '/member/modify', element: (
+          <MemberModify />
+        ),
       },
     ],
   },

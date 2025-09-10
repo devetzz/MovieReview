@@ -29,7 +29,7 @@ const KakaoRedirectPage = () => {
         }
       })
     })
-  }, [authCode])
+  }, [authCode, dispatch, moveToPath])
 
   return (
     <div>
